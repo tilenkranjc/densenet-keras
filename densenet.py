@@ -139,10 +139,11 @@ def DenseNet(img_dim,growth_rate,nb_classes,nb_filters,nb_layers,
     return model
 
 
-def DenseNetIN(img_dim,growth_rate,nb_classes,nb_filters,nb_layers=[6,12,24,16],
+def DenseNetIN(img_dim,growth_rate,nb_classes,nb_filters,nb_layers,
     init_kernel_size=(7,7),
     bottleneck=True,
-    compression_factor=0.5):
+    compression_factor=0.5,
+    weight_decay=1E-4):
     """ Function to generate the model of the DenseNet
     img_dim - dimensions of input images, tuple
     nb_classes - number of classes at the dense layer
@@ -153,7 +154,11 @@ def DenseNetIN(img_dim,growth_rate,nb_classes,nb_filters,nb_layers=[6,12,24,16],
     
     model_input = Input(shape=img_dim)
     
-    x = Conv2D(filters=nb_filters,kernel_size=init_kernel_size,padding="same")(model_input)
+    x = Conv2D(filters=nb_filters,kernel_size=(3,3),
+        kernel_initializer="he_uniform",
+        padding="same", use_bias=False,
+        name="initialConv2D",
+        kernel_regularizer=l2(weight_decay))(model_input)
     # for ImageNet type of densenet we also need maxpooling
     x = MaxPooling2D(pool_size=(2,2),strides=(2,2))(x)
 
@@ -173,7 +178,7 @@ def DenseNetIN(img_dim,growth_rate,nb_classes,nb_filters,nb_layers=[6,12,24,16],
     x = Dense(nb_classes,activation='softmax')(x)
     
     # generate model with certain inputs and outputs
-    model = Model(inputs=[model_input], outputs=[x])
+    model = Model(inputs=[model_input], outputs=[x], name="DenseNet")
     
     # return the model
     return model
