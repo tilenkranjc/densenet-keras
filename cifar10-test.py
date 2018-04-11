@@ -19,13 +19,7 @@ from keras.datasets import cifar10
 from keras.utils import np_utils
 from keras.optimizers import Adam
 
-
-
-
-# In[4]:
-
-
-from densenet import DenseNet
+from architectures import DenseNet40k12
 
 
 # In[5]:
@@ -60,12 +54,9 @@ for i in range(n_channels):
 
 
 # model
-growth_rate = 12
-nb_layers = [12,12,12]
-nb_filters = 16
 learning_rate = 1e-3
 
-model = DenseNet(img_dim,growth_rate, nb_classes, nb_filters, nb_layers)
+model = DenseNet40k12(img_dim,nb_classes)
 model.summary()
 
 
